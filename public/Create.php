@@ -1,164 +1,224 @@
 <?php
-    include '../config/db.php';
-    if(isset($_POST['submit'])) {
+include '../config/db.php';
 
+if (isset($_POST['submit'])) {
+
+    /* =========================
+       CUSTOMER
+    ==========================*/
+    $full_name = $_POST['full_name'];
+    $phone_no  = $_POST['phone_no'];
+    $email     = $_POST['email'];
+    $quantity  = $_POST['quantity'];
+
+    $sql = "INSERT INTO customers (full_name, phone_no, email, quantity)
+            VALUES ('$full_name', '$phone_no', '$email', '$quantity')";
+
+    if (mysqli_query($conn, $sql)) {
+        $customer_id = $conn->insert_id;
+    } else {
+        die("Customer Error: " . mysqli_error($conn));
+    }
+
+    /* =========================
+       ORDERS
+    ==========================*/
+    $total = $_POST['total'];
+
+    $sql2 = "INSERT INTO orders (customer_id, total)
+             VALUES ('$customer_id', '$total')";
+
+    if (mysqli_query($conn, $sql2)) {
         $order_id = $conn->insert_id;
+    } else {
+        die("Order Error: " . mysqli_error($conn));
+    }
 
-        // ====== Replace these variables with your own project fields ======
-        $full_name = $_POST['full_name'];               // Replace 'name' with your form input name
-        $phone_no = $_POST['phone_no'];
-        $email = $_POST['email'];             // Replace 'email' with your form input name
-        // ==================================================================
+    /* =========================
+       PRODUCTS
+    ==========================*/
+    $product_name = $_POST['product_name'];
+    $category     = $_POST['category'];
+    $price        = $_POST['price'];
+    $stock        = $_POST['stock'];
 
-        // ====== Replace 'students' with your table name ======
-        $sql = "INSERT INTO customers (full_name, phone_no, email) VALUES ('$full_name', '$phone_no', '$email')";
-        // =====================================================
+    $sql3 = "INSERT INTO products (product_name, category, price, stock)
+             VALUES ('$product_name', '$category', '$price', '$stock')";
 
-        if(mysqli_query($conn, $sql)){
-            $message = "Record added successfully!";
-        } else {
-            $message = "Error: " . mysqli_error($conn);
-        }
+    if (!mysqli_query($conn, $sql3)) {
+        die("Product Error: " . mysqli_error($conn));
+    }
 
-        $product_id = $conn->insert_id;
+    /* =========================
+       USERS
+    ==========================*/
+    $user_name = $_POST['user_name'];
+    $user_email = $_POST['user_email'];
+    $password = $_POST['password'];
+    $role = $_POST['role'];
 
-        $order_id = $_POST['order_id'];               // Replace 'name' with your form input name
-        $product_id = $_POST['product_id'];
-        $quantity = $_POST['quantity'];             // Replace 'email' with your form input name
-        $price = $_POST['price'];   // Replace 'department' with your form input name
-        // ==================================================================
+    $sql4 = "INSERT INTO users (user_name, user_email, password, role)
+             VALUES ('$user_name', '$user_email', '$password', '$role')";
 
-        // ====== Replace 'students' with your table name ======
-        $sql1 = "INSERT INTO orderitems (order_id, product_id, quantity, price) VALUES ('$order_id', '$product_id', '$quantity', '$price')";
-        // =====================================================
+    if (!mysqli_query($conn, $sql4)) {
+        die("User Error: " . mysqli_error($conn));
+    }
 
-        if(mysqli_query($conn, $sql1)){
-            $message = "Record added successfully!";
-        } else {
-            $message = "Error: " . mysqli_error($conn);
-        }
-
-        $customer_id = $_POST['customer_id'];               // Replace 'name' with your form input name
-        $order_date = $_POST['order_date'];
-        $total = $_POST['total'];             
-
-        // ====== Replace 'students' with your table name ======
-        $sql2 = "INSERT INTO orders (customer_id, order_date, total) VALUES ('$customer_id', '$order_date', '$total')";
-        // =====================================================
-
-        if(mysqli_query($conn, $sql2)){
-            $message = "Record added successfully!";
-        } else {
-            $message = "Error: " . mysqli_error($conn);
-        }
-
-        $name = $_POST['name'];               // Replace 'name' with your form input name
-        $category = $_POST['category'];
-        $price = $_POST['price'];             // Replace 'email' with your form input name
-        $stock = $_POST['stock'];   // Replace 'department' with your form input name
-        // ==================================================================
-
-        // ====== Replace 'students' with your table name ======
-        $sql3 = "INSERT INTO price (name, category, price, stock ) VALUES ('$name', '$category', '$price', '$stock')";
-        // =====================================================
-
-        if(mysqli_query($conn, $sql3)){
-            $message = "Record added successfully!";
-        } else {
-            $message = "Error: " . mysqli_error($conn);
-        }
-
-        $name = $_POST['name'];               // Replace 'name' with your form input name
-        $email = $_POST['email'];             // Replace 'email' with your form input name
-        $password = $_POST['password']; 
-        $role = $_POST['role'];  // Replace 'department' with your form input name
-        // ==================================================================
-
-        // ====== Replace 'students' with your table name ======
-        $sql4 = "INSERT INTO users (name, email, password, role) VALUES ('$name', '$email', '$password', '$role')";
-        // =====================================================
-
-        if(mysqli_query($conn, $sql4)){
-            $message = "Record added successfully!";
-        } else {
-            $message = "Error: " . mysqli_error($conn);
-        }
-
+    $message = "All records added successfully!";
 }
 ?>
 
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Management System</title>
+    <title>Cafe Management System</title>
+    <link rel="stylesheet" href="style.css">
+
     <style>
-        body { font-family: Arial, sans-serif; margin: 20px; }
-        table { border-collapse: collapse; width: 80%; margin-top: 20px; }
-        table, th, td { border: 1px solid #000; }
-        th, td { padding: 8px 12px; text-align: left; }
-        form { margin-bottom: 20px; }
-        input[type=text], input[type=email], input[type=date], input[type=number] { padding: 6px; margin: 4px 0; width: 200px; }
-        input[type=submit] { padding: 6px 12px; }
-        .message { color: green; }
+        /* Body & Headings */
+        body {
+            font-family: 'Verdana', Geneva, Tahoma, sans-serif;
+            background-color: #f0f8ff; /* Alice blue */
+            color: #4b2e83; /* deep purple */
+            margin: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #ff6f61; /* Coral red */
+            text-shadow: 1px 1px 2px #d4a5a5;
+        }
+
+        h2 {
+            color: #9d4edd; /* Medium purple */
+            margin-top: 20px;
+            border-bottom: 2px solid #fcd5ce; /* soft peach underline */
+            padding-bottom: 5px;
+        }
+
+        /* Form Styling */
+        form {
+            width: 650px;
+            margin: 0 auto;
+            background-color: #fff0f5; /* lavender blush */
+            padding: 20px 30px;
+            border-radius: 15px;
+            box-shadow: 0 6px 20px rgba(155, 89, 182, 0.3);
+        }
+
+        label {
+            display: inline-block;
+            width: 150px;
+            font-weight: bold;
+            color: #6a0572; /* deep magenta */
+        }
+
+        input {
+            margin-bottom: 12px;
+            padding: 8px;
+            width: 220px;
+            border-radius: 6px;
+            border: 1px solid #c08497; /* muted pink border */
+            background-color: #fce4ec; /* soft pink background */
+        }
+
+        input[type=submit] {
+            background-color: #7b2cbf; /* deep purple */
+            color: #ffe8d6; /* soft cream */
+            font-weight: bold;
+            cursor: pointer;
+            width: 150px;
+            transition: 0.3s;
+        }
+
+        input[type=submit]:hover {
+            background-color: #9d4edd; /* lighter purple on hover */
+        }
+
+        /* Success Message */
+        .message {
+            color: #ff9f1c; /* orange */
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        /* Responsive Design */
+        @media screen and (max-width: 768px) {
+            form {
+                width: 90%;
+                padding: 15px;
+            }
+
+            label, input {
+                width: 100%;
+                display: block;
+            }
+
+            input {
+                margin-bottom: 15px;
+            }
+        }
     </style>
 </head>
 <body>
 
 <h1>Cafe Management System</h1>
 
-<!-- ===============================
-     Form to add new record
-     Replace input fields according to your project fields
-================================ -->
+<?php if (isset($message)) { ?>
+    <p class="message"><?php echo $message; ?></p>
+<?php } ?>
+
 <form method="POST" action="Create.php">
+
     <h2>Customer</h2>
-    <label>Name:</label>
-    <input type="text" name="full_name" required>  <!-- Replace 'name' -->
-    
-    <label>Phone Number:</label>
-    <input type="text" name="phone_no" required> 
+    <label>Full Name:</label>
+    <input type="text" name="full_name" required><br>
+
+    <label>Phone:</label>
+    <input type="text" name="phone_no" required><br>
 
     <label>Email:</label>
-    <input type="email" name="email" required> <!-- Replace 'email' -->
+    <input type="email" name="email" required><br>
 
     <label>Quantity:</label>
-    <input type="number" name="quantity" required> <!-- Replace 'email' -->
-    
-    <label>Price:</label>
-    <input type="number" name="price" required>
+    <input type="number" name="quantity" required><br>
 
-    <h2>Orders</h2>
+    <h2>Order</h2>
+    <label>Order Name:</label>
+    <input type="text" name="order_name" required><br>
     
     <label>Total:</label>
-    <input type="number" name="total" required>
+    <input type="number" name="total" required><br>
 
-    <h2>Products</h2>
-    
-    <label>Name:</label>
-    <input type="text" name="name" required> 
+    <h2>Product</h2>
+    <label>Product Name:</label>
+    <input type="text" name="product_name" required><br>
 
     <label>Category:</label>
-    <input type="text" name="category" required> 
-    
-    <label>Price:</label>
-    <input type="number" name="price" required> <!-- Replace 'email' -->
-    
-    <label>Stock:</label>
-    <input type="number" name="stock" required>
+    <input type="text" name="category" required><br>
 
-     <h2>Users</h2>
-    
-    <label>Name:</label>
-    <input type="text" name="name" required> 
+    <label>Price:</label>
+    <input type="number" name="price" required><br>
+
+    <label>Stock:</label>
+    <input type="number" name="stock" required><br>
+
+    <h2>User</h2>
+    <label>User Name:</label>
+    <input type="text" name="user_name" required><br>
 
     <label>Email:</label>
-    <input type="email" name="email" required> 
-    
+    <input type="email" name="user_email" required><br>
+
     <label>Password:</label>
-    <input type="text" name="password" required> <!-- Replace 'email' -->
-    
+    <input type="text" name="password" required><br>
+
     <label>Role:</label>
-    <input type="text" name="role" required>
+    <input type="text" name="role" required><br>
 
     <input type="submit" name="submit" value="Add Record">
 </form>
+
+</body>
+</html>
